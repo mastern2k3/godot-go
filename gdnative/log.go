@@ -12,8 +12,6 @@ import (
 	"fmt"
 	"runtime"
 	"strings"
-
-	"github.com/vitaminwater/cgo.wchar"
 )
 
 // Log is used to log messages to Godot, and makes them viewable inside the
@@ -104,20 +102,11 @@ func stringAsGodotString(value string) *C.godot_string {
 		C.go_godot_string_new(GDNative.api, &godotString)
 		return &godotString
 	}
-
-	// Convert the Go string into a wchar
-	wcharString, err := wchar.FromGoString(value)
-	if err != nil {
-		fmt.Println("Error decoding string '"+value+"': ", err)
-		C.go_godot_string_new(GDNative.api, &godotString)
-		return &godotString
-	}
-
-	// Build the Godot string with the wchar
+	wchar, _ := StringToWcharT(value)
 	C.go_godot_string_new_with_wide_string(
 		GDNative.api,
 		&godotString,
-		(*C.wchar_t)(wcharString.Pointer()),
+		wchar,
 		C.int(len(value)),
 	)
 
